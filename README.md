@@ -1,10 +1,10 @@
-# .
+# Color Variables Migrator
 
 ## Installation
 
-- [Download](../../releases/latest/download/..sketchplugin.zip) the latest release of the plugin
+- [Download](../../releases/latest/download/color-variables-migrator.sketchplugin.zip) the latest release of the plugin
 - Un-zip
-- Double-click on ..sketchplugin
+- Double-click on color-variables-migrator.sketchplugin
 
 ## Development Guide
 

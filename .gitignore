@@ -1,5 +1,5 @@
 # build artifacts
-..sketchplugin
+color-variables-migrator.sketchplugin
 
 # npm
 node_modules
