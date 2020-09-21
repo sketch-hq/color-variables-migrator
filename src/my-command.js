@@ -106,19 +106,15 @@ function doUseColorSwatchesInStyles(context) {
         }
       }
     })
-    // TODO: This should also work with gradients...
+    // TODO: This could also work with gradients...
   })
 
   const allTextStyles = doc.sharedTextStyles
   allTextStyles.forEach( style => {
     const currentStyle = style.style
-    console.log(`Finding matching swatch for ${currentStyle}`);
     const swatch = matchingSwatchForColor(currentStyle.textColor)
-    console.log(swatch)
     if (swatch) {
-      console.log(`Assigning swatch to text style`);
       const newColor = swatch.referencingColor
-      //console.log('yo: ' + newColor.toMSImmutableColor())
       currentStyle.textColor = newColor
       console.log('---------------------------------------------------');
     }
@@ -126,11 +122,9 @@ function doUseColorSwatchesInStyles(context) {
 }
 
 function matchingSwatchForColor(color, name) {
-  console.log('matchingSwatchForColor: ' + color);
   // We need to match color *and* name, if we want this to work
   let swatches = sketch.getSelectedDocument().swatches
   let matchingSwatches = swatches.filter(swatch => swatch.color == color)
-  console.log(matchingSwatches.length)
   if (matchingSwatches.length == 0) {
     return null
   } else {
