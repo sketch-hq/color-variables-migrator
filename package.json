@@ -23,5 +23,8 @@
   "devDependencies": {
     "@skpm/builder": "^0.7.0"
   },
-  "author": "Ale M <bomberstudios@gmail.com>"
+  "author": "Ale M <bomberstudios@gmail.com>",
+  "dependencies": {
+    "sketch-module-web-view": "^3.4.3"
+  }
 }
