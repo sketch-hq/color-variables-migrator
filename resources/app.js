@@ -3,8 +3,7 @@
 let allInputs = [];
 [
   'option-1',
-  'option-2',
-  'option-3'
+  'option-2'
 ].forEach(id => {
   allInputs.push(document.getElementById(id))
 })

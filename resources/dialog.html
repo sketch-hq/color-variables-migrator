@@ -10,25 +10,18 @@
   <body>
     <div class='wrapper'>
       <h1>Color Variables Migrator</h1>
-      <p>This plugin will help you migrate Layer and Text Styles to use the new Color Variables feature in Sketch 69.</p>
-      <p>To do that, it provides you with three options:</p>
+      <p>Select migration options:</p>
 
       <div class='option'>
         <label for='option-1'>
-          <span><input id='option-1' type='checkbox' checked /> Replace Colors with matching Color Variables</span>
+          <span><input id='option-1' type='checkbox' checked /> Use Color Variables in Layers</span>
           <small>Update all layers to use the document's existing Color Variables.</small>
         </label>
       </div>
       <div class='option'>
         <label for='option-2'>
-          <span><input id='option-2' type='checkbox' checked /> Generate Color Variables for Colors not matching existing Color Variables</span>
-          <small>Color Variables will be created within a new 'Migrated Styles' group using the original style names.</small>
-        </label>
-      </div>
-      <div class='option'>
-        <label for='option-3'>
-          <span><input id='option-3' type='checkbox' checked /> Replace single-color Styles with Color Variables</span>
-          <small>Styles defining only a single fill or border will be turned into Color Variables. Layers using this style will be updated to use the Color Variables and the style will be deleted.</small>
+          <span><input id='option-2' type='checkbox' checked /> Use Color Variables in Styles</span>
+          <small>Update all Layer and Text Styles to use the document's existing Color Variables.</small>
         </label>
       </div>
       <footer><button id='cancel' class='secondary'>Cancel</button> <button id='submit'>Migrate</button></footer>
