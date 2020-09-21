@@ -23,7 +23,7 @@ export function migrateColors(context){
           // Nothing to see here, move along
           return
         }
-         
+
         const allLayers = sketch.find('*') // we can use something else if we don't want to bring Sketch down... Try with larger sample docs and see what happens...
         allLayers.forEach(layer => {
           layer.style.fills.filter(fill => fill.fillType == 'Color').forEach(fill => {
@@ -32,7 +32,7 @@ export function migrateColors(context){
             if (!swatch) {
               return
             }
-            let newColor = swatch._object.makeReferencingColor()
+            let newColor = swatch.referencingColor
             fill.color = newColor
           })
           // TODO: do the same with borders!
@@ -48,7 +48,7 @@ export function migrateStyles(context) {
   allLayerStyles.forEach( style => {
     style.style.fills.filter(fill => fill.fillType == 'Color').forEach(fill => {
       let swatch = matchingSwatchForColor(color)
-      let newColor = swatch._object.makeReferencingColor()
+      let newColor = swatch.referencingColor
       fill.color = newColor
     })
     // TODO: do the same for borders
@@ -63,7 +63,7 @@ export function migrateStyles(context) {
       // TODO: would be nice to ask the user if they want to create a new Swatch if there's not a match for the color used in the text style...
       return
     }
-    let newColor = swatch._object.makeReferencingColor()
+    let newColor = swatch.referencingColor
     style.style.textColor = newColor
   })
 }
@@ -71,7 +71,7 @@ export function migrateStyles(context) {
 export function convertStyles(context) {
   // Thinking about this, I guess it makes sense to merge this and migrateStyles
   // I'll keep them separated for the time being, but there will be a lot of code duplication
-  
+
   /*
     TODO: this breaks layer styles if a layer has a style + another fill color. One way to avoid this is to check if the style is dirty _before_ replacing it with a Swatch. That way, we can either not do it (easiest), or create a new Swatch and assign it after replacing the style with a Swatch (that's probably a project on its own, since we'd need to check _how_ the local attributes differ from those defined on the Layer Style).
     If we decide not to do it, keep a reference to this and generate a report at the end.
@@ -95,7 +95,7 @@ export function convertStyles(context) {
         doc.swatches.push(fillSwatch)
         fillSwatch = matchingSwatchForColor(swatchColor, swatchName)
       }
-      currentStyle.fills[0].color = fillSwatch._object.makeReferencingColor()
+      currentStyle.fills[0].color = fillSwatch.referencingColor
       style.getAllInstances().forEach(styleInstance => {
         styleInstance.syncWithSharedStyle(style)
       })
@@ -113,7 +113,7 @@ export function convertStyles(context) {
         doc.swatches.push(borderSwatch)
         borderSwatch = matchingSwatchForColor(swatchColor, swatchName)
       }
-      currentStyle.borders[0].color = borderSwatch._object.makeReferencingColor()
+      currentStyle.borders[0].color = borderSwatch.referencingColor
       style.getAllInstances().forEach(styleInstance => {
         styleInstance.syncWithSharedStyle(style)
       })
@@ -135,13 +135,13 @@ function matchingSwatchForColor(color, name) {
     if (name) {
         return matchingSwatches.filter(swatch => swatch.name == name)[0]
     } else {
-      return matchingSwatches[0]  
+      return matchingSwatches[0]
     }
   }
 }
 
 function colorVariableFromColor(color) {
   let swatch = matchingSwatchForColor(color)
-  let newColor = swatch._object.makeReferencingColor()
+  let newColor = swatch.referencingColor
   return newColor
 }
