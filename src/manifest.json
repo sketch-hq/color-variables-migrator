@@ -3,30 +3,17 @@
   "icon": "icon.png",
   "commands": [
     {
-      "name": "Migrate Layer Colors to Color Variables",
-      "identifier": "color-variables-migrator.migrate-colors",
-      "handler": "migrateColors",
+      "name": "Color Variables Migrator",
+      "identifier": "color-variables-migrator.migrate",
+      "handler": "migrate",
       "script": "./my-command.js"
-    },
-    {
-      "name": "Migrate Styles to Color Variables",
-      "identifier": "color-variables-migrator.migrate-styles",
-      "handler": "migrateStyles",
-      "script": "./my-command.js"
-    },
-    {
-      "name": "Convert Styles to Color Variables",
-      "identifier": "color-variables-migrator.convert-styles",
-      "handler": "convertStyles",
-      "script": "./my-command.js"
-    }
+      }
   ],
   "menu": {
     "title": "Color Variables Migrator",
+    "isRoot": true,
     "items": [
-      "color-variables-migrator.migrate-colors",
-      "color-variables-migrator.migrate-styles",
-      "color-variables-migrator.convert-styles"
+      "color-variables-migrator.migrate"
     ]
   }
 }
