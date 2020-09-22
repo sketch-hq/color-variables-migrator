@@ -69,7 +69,7 @@ function performMigration(options) {
 
 function doUseColorSwatchesInLayers(context){
   // When you open an existing document in Sketch 69, the color assets in the document will be migrated to Color Swatches. However, layers using those colors will not be changed to use the new swatches. This plugin takes care of this
-  const allLayers = sketch.find('*') // TODO: optimise this query
+  const allLayers = sketch.find('*') // TODO: optimise this query: ShapePath, SymbolMaster, Text, SymbolInstance
   allLayers.forEach(layer => {
     layer.style.fills.filter(fill => fill.fillType == 'Color').forEach(fill => {
       const layerColor = fill.color
@@ -89,6 +89,16 @@ function doUseColorSwatchesInLayers(context){
       let newColor = swatch.referencingColor
       border.color = newColor
     })
+    // Previous actions don't work for Text Layer colors that are colored using TextColor, so let's fix that:
+    if (layer.style.textColor) {
+      const layerColor = layer.style.textColor
+      let swatch = matchingSwatchForColor(layerColor)
+      if (!swatch) {
+        return
+      }
+      let newColor = swatch.referencingColor
+      layer.style.textColor = newColor
+    }
   })
 }
 
@@ -109,16 +119,17 @@ function doUseColorSwatchesInStyles(context) {
     // TODO: This could also work with gradients...
   })
 
-  const allTextStyles = doc.sharedTextStyles
-  allTextStyles.forEach( style => {
-    const currentStyle = style.style
-    const swatch = matchingSwatchForColor(currentStyle.textColor)
-    if (swatch) {
-      const newColor = swatch.referencingColor
-      currentStyle.textColor = newColor
-      console.log('---------------------------------------------------');
-    }
-  })
+  // TODO: there is a bug here, somewhere, and Text Styles are not migrated properly. So this is disable by now
+  // const allTextStyles = doc.sharedTextStyles
+  // allTextStyles.forEach( style => {
+  //   const currentStyle = style.style
+  //   const swatch = matchingSwatchForColor(currentStyle.textColor)
+  //   if (swatch) {
+  //     // The following line is only executed once, then the plugin breaks with a `Assertion failure in +[BCAssertion assertObject:isOfClass:]` error
+  //     // Apparently, we try to call `toMSImmutableColor:` in `newColor`, which is undefined. But that doesn't really explain why it works the first time...
+  //     currentStyle.textColor = swatch.referencingColor
+  //   }
+  // })
 }
 
 function matchingSwatchForColor(color, name) {
