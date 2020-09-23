@@ -11,7 +11,7 @@ export function migrate(context) {
   const options = {
     identifier: webviewIdentifier,
     width: 400,
-    height: 276,
+    height: 236,
     show: false,
     resizable: false,
     title: 'Color Variables Migrator',

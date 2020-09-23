@@ -62,7 +62,6 @@ body.__skpm-dark textarea {
 
 label {
   display: block;
-/*  margin-bottom: 1em;*/
 }
 
 p {
@@ -76,7 +75,7 @@ p {
   display: block;
   font-size: 1em;
   opacity: 0.5;
-  margin-left: 1.4em;
+  margin-left: 1.2em;
   margin-top: 0.2em;
 }
 
@@ -112,4 +111,8 @@ button.secondary {
 
 input[type=checkbox] {
 
+}
+
+.wrapper > p {
+  margin-top: 0;
 }
