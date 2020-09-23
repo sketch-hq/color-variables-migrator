@@ -77,7 +77,8 @@ function doUseColorSwatchesInLayers(context){
       if (!swatch) {
         return
       }
-      let newColor = swatch.referencingColor
+      // TODO: change this to swatch.referencingColor when the API is final
+      let newColor = swatch._object.makeReferencingColor()
       fill.color = newColor
     })
     layer.style.borders.filter(border => border.fillType == 'Color').forEach(border => {
@@ -86,7 +87,8 @@ function doUseColorSwatchesInLayers(context){
       if (!swatch) {
         return
       }
-      let newColor = swatch.referencingColor
+      // TODO: change this to swatch.referencingColor when the API is final
+      let newColor = swatch._object.makeReferencingColor()
       border.color = newColor
     })
     // Previous actions don't work for Text Layer colors that are colored using TextColor, so let's fix that:
@@ -96,7 +98,8 @@ function doUseColorSwatchesInLayers(context){
       if (!swatch) {
         return
       }
-      let newColor = swatch.referencingColor
+      // TODO: change this to swatch.referencingColor when the API is final
+      let newColor = swatch._object.makeReferencingColor()
       layer.style.textColor = newColor
     }
   })
@@ -112,7 +115,8 @@ function doUseColorSwatchesInStyles(context) {
       if (item.fillType == 'Color') {
         const swatch = matchingSwatchForColor(item.color)
         if (swatch) {
-          item.color = swatch.referencingColor
+          // TODO: change this to swatch.referencingColor when the API is final
+          item.color = swatch._object.makeReferencingColor()
         }
       }
     })
@@ -127,7 +131,8 @@ function doUseColorSwatchesInStyles(context) {
   //   if (swatch) {
   //     // The following line is only executed once, then the plugin breaks with a `Assertion failure in +[BCAssertion assertObject:isOfClass:]` error
   //     // Apparently, we try to call `toMSImmutableColor:` in `newColor`, which is undefined. But that doesn't really explain why it works the first time...
-  //     currentStyle.textColor = swatch.referencingColor
+    // TODO: change this to swatch.referencingColor when the API is final
+  //     currentStyle.textColor = swatch._object.makeReferencingColor()
   //   }
   // })
 }
@@ -149,6 +154,7 @@ function matchingSwatchForColor(color, name) {
 
 function colorVariableFromColor(color) {
   let swatch = matchingSwatchForColor(color)
-  let newColor = swatch.referencingColor
+  // TODO: change this to swatch.referencingColor when the API is final
+  let newColor = swatch._object.makeReferencingColor()
   return newColor
 }
