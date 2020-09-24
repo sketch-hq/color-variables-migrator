@@ -1,12 +1,12 @@
 {
   "name": "color-variables-migrator",
-  "description": "",
+  "description": "Migrate your Layers and Styles to use Color Variables",
   "version": "0.2.3",
   "engines": {
     "sketch": ">=49.0"
   },
   "skpm": {
-    "name": "color-variables-migrator",
+    "name": "Color Variables Migrator",
     "manifest": "src/manifest.json",
     "main": "color-variables-migrator.sketchplugin",
     "assets": [
@@ -29,7 +29,7 @@
   "resources": [
     "resources/**/*.js"
   ],
-  "author": "Ale M <ale@sketch.com>",
+  "author": "Sketch <developer@sketch.com>",
   "repository": "https://github.com/sketch-hq/color-variables-migrator.git",
   "dependencies": {
     "sketch-module-web-view": "^3.4.3"
