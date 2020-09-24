@@ -1,7 +1,7 @@
 {
   "name": "color-variables-migrator",
   "description": "",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "engines": {
     "sketch": ">=49.0"
   },
