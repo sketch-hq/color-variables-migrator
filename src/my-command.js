@@ -107,7 +107,6 @@ function doUseColorSwatchesInLayers(context){
 
 function doUseColorSwatchesInStyles(context) {
   // This method traverses all Layer and Text Styles, and makes sure they use Color Swatches that exist in the document.
-
   const allLayerStyles = doc.sharedLayerStyles
   allLayerStyles.forEach( style => {
     const currentStyle = style.style
@@ -123,32 +122,37 @@ function doUseColorSwatchesInStyles(context) {
     // TODO: This could also work with gradients...
   })
 
-  // TODO: there is a bug here, somewhere, and Text Styles are not migrated properly. So this is disable by now
-  // const allTextStyles = doc.sharedTextStyles
-  // allTextStyles.forEach( style => {
-  //   const currentStyle = style.style
-  //   const swatch = matchingSwatchForColor(currentStyle.textColor)
-  //   if (swatch) {
-  //     // The following line is only executed once, then the plugin breaks with a `Assertion failure in +[BCAssertion assertObject:isOfClass:]` error
-  //     // Apparently, we try to call `toMSImmutableColor:` in `newColor`, which is undefined. But that doesn't really explain why it works the first time...
-    // TODO: change this to swatch.referencingColor when the API is final
-  //     currentStyle.textColor = swatch._object.makeReferencingColor()
-  //   }
-  // })
+  const allTextStyles = doc.sharedTextStyles
+  allTextStyles.forEach( style => {
+    const currentStyle = style.style
+    const swatch = matchingSwatchForColor(currentStyle.textColor)
+    if (swatch) {
+      // TODO: change this to swatch.referencingColor when the API is final
+      currentStyle.textColor = swatch._object.makeReferencingColor()
+    }
+  })
 }
 
 function matchingSwatchForColor(color, name) {
   // We need to match color *and* name, if we want this to work
-  let swatches = sketch.getSelectedDocument().swatches
-  let matchingSwatches = swatches.filter(swatch => swatch.color == color)
+  const swatches = sketch.getSelectedDocument().swatches
+  const matchingSwatches = swatches.filter(swatch => swatch.color === color)
   if (matchingSwatches.length == 0) {
     return null
-  } else {
-    if (name) {
-      return matchingSwatches.filter(swatch => swatch.name == name)[0]
+  }
+  if (matchingSwatches.length == 1) {
+    return matchingSwatches[0]
+  }
+  // This means there are multiple swatches matching the color. We'll see if we can find one that also matches the name. If we don't find one, or there is no name provided, return the first match.
+  if (name) {
+    const swatchesMatchingName = matchingSwatches.filter(swatch => swatch.name === name)
+    if (swatchesMatchingName.length) {
+      return swatchesMatchingName[0]
     } else {
       return matchingSwatches[0]
     }
+  } else {
+    return matchingSwatches[0]
   }
 }
 
