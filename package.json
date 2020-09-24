@@ -1,7 +1,7 @@
 {
   "name": "color-variables-migrator",
   "description": "Migrate your Layers and Styles to use Color Variables",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "engines": {
     "sketch": ">=49.0"
   },
