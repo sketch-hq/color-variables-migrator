@@ -96,10 +96,16 @@ function doUseColorSwatchesInLayers(context) {
 
 function doUseColorSwatchesInStyles(context) {
   // This method traverses all Layer and Text Styles, and makes sure they use Color Swatches that exist in the document.
+  const stylesCanBeUpdated = []
+
   const allLayerStyles = doc.sharedLayerStyles
   allLayerStyles.forEach(style => {
-    const currentStyle = style.style
-    currentStyle.fills.concat(currentStyle.borders).forEach(item => {
+    style.getAllInstances().forEach(styleInstance => {
+      if (!styleInstance.isOutOfSyncWithSharedStyle(style)) {
+        stylesCanBeUpdated.push({ instance: styleInstance, style: style })
+      }
+    })
+    style.style.fills.concat(style.style.borders).forEach(item => {
       if (item.fillType == 'Color') {
         const swatch = matchingSwatchForColor(item.color)
         if (swatch) {
@@ -112,11 +118,20 @@ function doUseColorSwatchesInStyles(context) {
 
   const allTextStyles = doc.sharedTextStyles
   allTextStyles.forEach(style => {
+    style.getAllInstances().forEach(styleInstance => {
+      if (!styleInstance.isOutOfSyncWithSharedStyle(style)) {
+        stylesCanBeUpdated.push({ instance: styleInstance, style: style })
+      }
+    })
     const currentStyle = style.style
     const swatch = matchingSwatchForColor(currentStyle.textColor)
     if (swatch) {
       currentStyle.textColor = swatch.referencingColor
     }
+  })
+  // Finally, update all layers that use a style we updated...
+  stylesCanBeUpdated.forEach(pair => {
+    pair.instance.syncWithSharedStyle(pair.style)
   })
 }
 
