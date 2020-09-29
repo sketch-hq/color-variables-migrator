@@ -72,26 +72,15 @@ function doUseColorSwatchesInLayers(context) {
   const allLayers = sketch.find('*') // TODO: optimise this query: ShapePath, SymbolMaster, Text, SymbolInstance
   allLayers.forEach(layer => {
     layer.style.fills
-      .filter(fill => fill.fillType == 'Color')
-      .forEach(fill => {
-        const layerColor = fill.color
+      .concat(layer.style.borders)
+      .filter(item => item.fillType == 'Color')
+      .forEach(item => {
+        const layerColor = item.color
         let swatch = matchingSwatchForColor(layerColor)
         if (!swatch) {
           return
         }
-        let newColor = swatch.referencingColor
-        fill.color = newColor
-      })
-    layer.style.borders
-      .filter(border => border.fillType == 'Color')
-      .forEach(border => {
-        const layerColor = border.color
-        let swatch = matchingSwatchForColor(layerColor)
-        if (!swatch) {
-          return
-        }
-        let newColor = swatch.referencingColor
-        border.color = newColor
+        item.color = swatch.referencingColor
       })
     // Previous actions don't work for Text Layer colors that are colored using TextColor, so let's fix that:
     if (layer.style.textColor) {
@@ -100,8 +89,7 @@ function doUseColorSwatchesInLayers(context) {
       if (!swatch) {
         return
       }
-      let newColor = swatch.referencingColor
-      layer.style.textColor = newColor
+      layer.style.textColor = swatch.referencingColor
     }
   })
 }
