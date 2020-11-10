@@ -7,6 +7,14 @@ const Swatch = sketch.Swatch
 const doc = sketch.getSelectedDocument()
 const webviewIdentifier = 'color-variables-migrator.webview'
 
+const automatedPrefix = "Auto-generated/";
+const ItemType = {
+  shape: 'shape',
+  text: 'text',
+  layerStyle: 'layerstyle',
+  textStyle: 'textstyle'
+}
+
 export function migrate(context) {
   const options = {
     identifier: webviewIdentifier,
@@ -66,7 +74,7 @@ function performMigration(options) {
     doUseColorSwatchesInStyles()
   }
   if (createColorSwatches) {
-    console.log("We're gonna create swatcheeees")
+    createMissingSwatches()
   }
 
   UI.message('Color migration complete.')
@@ -138,6 +146,147 @@ function doUseColorSwatchesInStyles(context) {
   stylesCanBeUpdated.forEach(pair => {
     pair.instance.syncWithSharedStyle(pair.style)
   })
+}
+
+function clog(message){
+  console.log(message);
+}
+
+function createMissingSwatches(context) {
+  const currentSwatches = new Map()
+  const missingSwatches = new Map()
+
+  doc.swatches.forEach(function (swatch) {
+    currentSwatches.set(swatch.color, swatch);
+  });
+
+  const allLayers = sketch.find('*') // TODO: optimise this query: ShapePath, SymbolMaster, Text, SymbolInstance
+  const updatedLayersMap = new Map();
+  allLayers.forEach(layer => {
+    layer.style.fills
+      .concat(layer.style.borders)
+      .filter(item => item.fillType == 'Color')
+      .forEach(item => {
+        if (!currentSwatches.has(item.color)) {
+          clog("Fill/border in layer " + layer.name + " doesn't map to any color variable");
+          var elementToUpdate = {
+            "layer": layer,
+            "item": item,
+            "type": ItemType.shape
+          }
+          if (!missingSwatches.has(item.color)) {
+            var elementsToUpdate = []
+            elementsToUpdate.push(elementToUpdate)
+            missingSwatches.set(item.color, elementsToUpdate);
+          }
+          else {
+            var elementsToUpdate = missingSwatches.get(item.color);
+            elementsToUpdate.push(elementToUpdate)
+          }
+        }
+      })
+    if (layer.style.textColor) {
+      if (!currentSwatches.has(layer.style.textColor)) {
+        clog("Text color in layer " + layer.name + " doesn't map to any color variable");
+        var elementToUpdate = {
+          "layer": layer,
+          "type": ItemType.text
+        }
+        if (!missingSwatches.has(layer.style.textColor)) {
+          var elementsToUpdate = [];
+          elementsToUpdate.push(elementToUpdate)
+          missingSwatches.set(layer.style.textColor, elementsToUpdate);
+        }
+        else {
+          var elementsToUpdate = missingSwatches.get(layer.style.textColor);
+          elementsToUpdate.push(elementToUpdate)
+        }
+      }
+    }
+  })
+
+
+  const allLayerStyles = doc.sharedLayerStyles;
+  const updatedStylesMap = new Map()
+  allLayerStyles.forEach(style => {
+    style.style.fills.concat(style.style.borders).forEach(item => {
+      if (item.fillType == 'Color') {
+        if (!currentSwatches.has(item.color)) {
+          clog("Fill/border in style " + style.name + " doesn't map to any color variable");
+          var elementToUpdate = {
+            "style": style,
+            "item": item,
+            "type": ItemType.layerStyle
+          }
+          if (!missingSwatches.has(item.color)) {
+            var elementsToUpdate = []
+            elementsToUpdate.push(elementToUpdate)
+            missingSwatches.set(item.color, elementsToUpdate)
+          }
+          else {
+            var elementsToUpdate = missingSwatches.get(item.color)
+            elementsToUpdate.push(elementToUpdate)
+          }
+        }
+      }
+    })
+  })
+
+  const allTextStyles = doc.sharedTextStyles
+  allTextStyles.forEach(style => {
+    if (!currentSwatches.has(style.style.textColor)) {
+      clog("Color in text style " + style.name + " doesn't map to any color variable");
+      var elementToUpdate = {
+        "style": style,
+        "type": ItemType.textStyle
+      }
+      if (!missingSwatches.has(style.style.textColor)) {
+        var elementsToUpdate = []
+        elementsToUpdate.push(elementToUpdate)
+        missingSwatches.set(style.style.textColor, elementsToUpdate)
+      }
+      else {
+        var elementsToUpdate = missingSwatches.get(style.style.textColor)
+        elementsToUpdate.push(elementToUpdate)
+      }
+    }
+  })
+
+
+  clog("Adding non-existing swatches");
+  missingSwatches.forEach(function (value, key) {
+
+    clog("-- Adding swatch: " + key.toString() + ", used in " + value.length + " places");
+    doc.swatches.push(sketch.Swatch.from({
+      name: automatedPrefix + key,
+      color: key.toString()
+    }));
+
+    value.forEach(function (elementToUpdate) {
+      switch (elementToUpdate.type) {
+        case ItemType.shape:
+          clog("---- Will update layer: " + elementToUpdate.layer.name)
+          elementToUpdate.item.color = doc.swatches[doc.swatches.length - 1].referencingColor;
+          if (!updatedLayersMap.has(elementToUpdate.layer)) updatedLayersMap.set(elementToUpdate.layer, true);
+          break;
+        case ItemType.text:
+          clog("---- Will update text layer: " + elementToUpdate.layer.name)
+          elementToUpdate.layer.style.textColor = doc.swatches[doc.swatches.length - 1].referencingColor;
+          if (!updatedLayersMap.has(elementToUpdate.layer)) updatedLayersMap.set(elementToUpdate.layer, true);
+          break;
+        case ItemType.layerStyle:
+          clog("---- Will update layer style: " + elementToUpdate.style.name)
+          elementToUpdate.item.color = doc.swatches[doc.swatches.length - 1].referencingColor;
+          if (!updatedStylesMap.has(elementToUpdate.style)) updatedStylesMap.set(elementToUpdate.style, true);
+          break;
+        case ItemType.textStyle:
+          clog("---- Will update text style: " + elementToUpdate.style.name)
+          elementToUpdate.style.style.textColor = doc.swatches[doc.swatches.length - 1].referencingColor;
+          if (!updatedStylesMap.has(elementToUpdate.style)) updatedStylesMap.set(elementToUpdate.style, true);
+          break;
+      }
+    });
+  });
 }
 
 function matchingSwatchForColor(color, name) {
