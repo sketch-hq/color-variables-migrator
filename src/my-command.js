@@ -148,9 +148,6 @@ function doUseColorSwatchesInStyles(context) {
   })
 }
 
-function clog(message){
-  console.log(message);
-}
 
 function createMissingSwatches(context) {
   const currentSwatches = new Map()
@@ -168,7 +165,6 @@ function createMissingSwatches(context) {
       .filter(item => item.fillType == 'Color')
       .forEach(item => {
         if (!currentSwatches.has(item.color)) {
-          clog("Fill/border in layer " + layer.name + " doesn't map to any color variable");
           var elementToUpdate = {
             "layer": layer,
             "item": item,
@@ -187,7 +183,6 @@ function createMissingSwatches(context) {
       })
     if (layer.style.textColor) {
       if (!currentSwatches.has(layer.style.textColor)) {
-        clog("Text color in layer " + layer.name + " doesn't map to any color variable");
         var elementToUpdate = {
           "layer": layer,
           "type": ItemType.text
@@ -212,7 +207,6 @@ function createMissingSwatches(context) {
     style.style.fills.concat(style.style.borders).forEach(item => {
       if (item.fillType == 'Color') {
         if (!currentSwatches.has(item.color)) {
-          clog("Fill/border in style " + style.name + " doesn't map to any color variable");
           var elementToUpdate = {
             "style": style,
             "item": item,
@@ -235,7 +229,6 @@ function createMissingSwatches(context) {
   const allTextStyles = doc.sharedTextStyles
   allTextStyles.forEach(style => {
     if (!currentSwatches.has(style.style.textColor)) {
-      clog("Color in text style " + style.name + " doesn't map to any color variable");
       var elementToUpdate = {
         "style": style,
         "type": ItemType.textStyle
@@ -253,10 +246,8 @@ function createMissingSwatches(context) {
   })
 
 
-  clog("Adding non-existing swatches");
   missingSwatches.forEach(function (value, key) {
 
-    clog("-- Adding swatch: " + key.toString() + ", used in " + value.length + " places");
     doc.swatches.push(sketch.Swatch.from({
       name: automatedPrefix + key,
       color: key.toString()
@@ -265,22 +256,18 @@ function createMissingSwatches(context) {
     value.forEach(function (elementToUpdate) {
       switch (elementToUpdate.type) {
         case ItemType.shape:
-          clog("---- Will update layer: " + elementToUpdate.layer.name)
           elementToUpdate.item.color = doc.swatches[doc.swatches.length - 1].referencingColor;
           if (!updatedLayersMap.has(elementToUpdate.layer)) updatedLayersMap.set(elementToUpdate.layer, true);
           break;
         case ItemType.text:
-          clog("---- Will update text layer: " + elementToUpdate.layer.name)
           elementToUpdate.layer.style.textColor = doc.swatches[doc.swatches.length - 1].referencingColor;
           if (!updatedLayersMap.has(elementToUpdate.layer)) updatedLayersMap.set(elementToUpdate.layer, true);
           break;
         case ItemType.layerStyle:
-          clog("---- Will update layer style: " + elementToUpdate.style.name)
           elementToUpdate.item.color = doc.swatches[doc.swatches.length - 1].referencingColor;
           if (!updatedStylesMap.has(elementToUpdate.style)) updatedStylesMap.set(elementToUpdate.style, true);
           break;
         case ItemType.textStyle:
-          clog("---- Will update text style: " + elementToUpdate.style.name)
           elementToUpdate.style.style.textColor = doc.swatches[doc.swatches.length - 1].referencingColor;
           if (!updatedStylesMap.has(elementToUpdate.style)) updatedStylesMap.set(elementToUpdate.style, true);
           break;
