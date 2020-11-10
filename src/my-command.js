@@ -53,6 +53,7 @@ export function onShutdown() {
 function performMigration(options) {
   const useColorSwatchesInLayers = options['option-1']
   const useColorSwatchesInStyles = options['option-2']
+  const createColorSwatches = options['option-3']
 
   if (!useColorSwatchesInLayers && !useColorSwatchesInStyles) {
     // Yo, you know there's a Cancel button for this, right?
@@ -64,6 +65,10 @@ function performMigration(options) {
   if (useColorSwatchesInStyles) {
     doUseColorSwatchesInStyles()
   }
+  if (createColorSwatches) {
+    console.log("We're gonna create swatcheeees")
+  }
+
   UI.message('Color migration complete.')
 }
 
