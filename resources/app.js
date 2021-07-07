@@ -3,7 +3,8 @@ document.addEventListener("contextmenu", e => e.preventDefault())
 let allInputs = [];
 [
   'option-1',
-  'option-2'
+  'option-2',
+  'option-3'
 ].forEach(id => {
   allInputs.push(document.getElementById(id))
 })
